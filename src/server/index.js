@@ -1,33 +1,17 @@
 const { ApolloServer, gql } = require('apollo-server');
-const { readFileSync } = require('fs');
 
-// we must convert the file Buffer to a UTF-8 string
+// The GraphQL schema
 const typeDefs = gql`
-type Problem {
-    title: String!
-    prompt: String!
-    author: String!
-    code: String!
-    solutions: [Solution] @relation
-  }
-
-  type Solution {
-    author: String!
-    code: String!
-    problem: Problem
-  }
-
   type Query {
-    allProblems: [Problem!]
-    allSolutions: [Solution!]
+    "A simple type for getting started!"
+    hello: String
   }
 `;
 
 // A map of functions which return data for the schema.
 const resolvers = {
   Query: {
-    allProblems: () => [],
-    allSolutions: () => []
+    hello: () => 'world',
   },
 };
 

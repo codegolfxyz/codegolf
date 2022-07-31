@@ -13,7 +13,7 @@
   "scripts": {
     "tsc": "./node_modules/typescript/bin/tsc",
     "build": "yarn tsc",
-    "postinstall": "yarn build && cd frontend && yarn build",
+    "postinstall": "yarn build && cd frontend && yarn install && yarn build",
     "start": "node dist/app.js",
     "dev": "yarn build && yarn start"
   },

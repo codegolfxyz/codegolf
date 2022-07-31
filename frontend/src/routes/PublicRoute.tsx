@@ -5,10 +5,7 @@ export const PublicRoute = ({
   component: Component,
   restricted,
   ...rest
-}: {
-  component: React.ElementType;
-  restricted: boolean;
-}) => {
+}: any) => {
   const user = useUserData();
   return (
     // restricted = false meaning public route

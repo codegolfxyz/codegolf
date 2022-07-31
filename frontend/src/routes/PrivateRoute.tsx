@@ -4,9 +4,7 @@ import { useUserData } from "../state/user/useUserData";
 export const PrivateRoute = ({
   component: Component,
   ...rest
-}: {
-  component: React.ElementType;
-}) => {
+}: any) => {
   const user = useUserData();
   return (
     // Show the component only when the user is logged in

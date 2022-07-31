@@ -1,24 +1,24 @@
-import { ChangeEvent, useState } from "react";
-import { useUserData } from "../state/useUserData";
+import { useState } from "react";
+
+export type ProblemDetailsField = "title" | "prompt";
 
 export function useProblemDetailsForm() {
   const [title, setTitle] = useState("");
   const [prompt, setPrompt] = useState("");
-  const { username } = useUserData();
 
-  const changeTitle = (e: ChangeEvent<HTMLInputElement>) => {
-    setTitle(e.target.value);
-  };
-
-  const changePrompt = (e: ChangeEvent<HTMLInputElement>) => {
-    setPrompt(e.target.value);
+  const changeInputValue = (value: string, field: ProblemDetailsField) => {
+    switch (field) {
+      case "prompt":
+        setPrompt(value);
+        return;
+      case "title":
+        setTitle(value);
+    }
   };
 
   return {
     title,
     prompt,
-    changePrompt,
-    changeTitle,
-    username,
+    changeInputValue,
   };
 }

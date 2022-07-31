@@ -1,7 +1,7 @@
 import { Container, Typography } from "@mui/material";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/system/Box";
-import React, { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 import TextField from "@mui/material/TextField";
 
 interface ProblemDetailsFormProps {

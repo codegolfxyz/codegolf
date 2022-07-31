@@ -1,4 +1,3 @@
-import React from "react";
 import { NavBar } from "./navbar/NavBar";
 import { Routes } from "./routes/Routes";
 

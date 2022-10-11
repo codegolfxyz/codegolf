@@ -3,7 +3,7 @@ import bodyParser from "koa-bodyparser";
 import Router from "koa-router";
 import jwt from "jsonwebtoken";
 import { HttpError, ErrorInfo, UnsupportedGrantType, InvalidClientError } from "./errors.js";
-import client from '../db/client.js';
+import db from '../db/db.js';
 
 const app = new Koa();
 const router = new Router();
@@ -41,7 +41,7 @@ router.post("/token", async (ctx, next) => {
         throw new InvalidClientError(`Invalid type for password: ${typeof password}.`);
     }
 
-    const result = await client.query("SELECT * FROM users WHERE username=$1::text AND password=$2::text", [username, password]);
+    const result = await db.query("SELECT * FROM users WHERE username=$1::text AND password=$2::text", [username, password]);
 
     if (result.rows.length < 1) {
         throw new InvalidClientError("Invalid username or password.");

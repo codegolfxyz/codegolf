@@ -1,7 +1,10 @@
 import pg from "pg";
 
 const connectionString = `${process.env.DATABASE_URL!}?sslmode=require`;
-const pool = new pg.Pool({ connectionString });
+const pool = new pg.Pool({
+    connectionString,
+    ssl: { rejectUnauthorized: !process.env.HEROKU_PR_NUMBER }
+});
 await pool.connect();
 const res = await pool.query('SELECT $1::text as message', ['Database connection successful!']);
 console.log(res.rows[0].message);

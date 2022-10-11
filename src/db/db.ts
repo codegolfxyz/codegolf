@@ -6,7 +6,7 @@ const useSSL = !localhost;
 const pool = useSSL
     ? new pg.Pool({
         connectionString: `${url}?sslmode=require`,
-        ssl: { rejectUnauthorized: false }
+        ssl: { requestCert: true, rejectUnauthorized: false }
     })
     : new pg.Pool({ connectionString: url });
 

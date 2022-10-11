@@ -1,7 +1,7 @@
 import db from "./db.js";
 
 // TODO: Remove me after we implement user creation.
-await db.query(`DROP TABLE users`);
+await db.query(`DROP TABLE IF EXISTS users`);
 
 try {
     await db.query("SELECT 42 FROM users WHERE username = 'nardi'");

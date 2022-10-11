@@ -12,7 +12,8 @@
       "SECRET_KEY": {
         "description": "A comma-separated list of secret keys for generating and validating auth tokens.",
         "value": "f29c3bd2bcf58779eade176f597327e8372bfc788c10f4a1dba10a4a932326a3"
-      }
+      },
+      "PGSSLMODE": "no-verify"
     },
     "addons": [
         "heroku-postgresql:hobby-dev"

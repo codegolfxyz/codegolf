@@ -1,0 +1,25 @@
+{
+    "name": "codegolf.xyz",
+    "description": "code putt-putt",
+    "keywords": ["code golf", "code", "golf", "xyz", "codegolf.xyz"],
+    "website": "https://codegolf.xyz/",
+    "repository": "https://github.com/codegolfxyz/codegolf",
+    "logo": "https://codegolf.xyz/logo.svg",
+    "scripts": {
+      "postdeploy": "echo WOOOOOOOOOO"
+    },
+    "env": {
+      "SECRET_KEY": {
+        "description": "A comma-separated list of secret keys for generating and validating auth tokens.",
+        "value": "f29c3bd2bcf58779eade176f597327e8372bfc788c10f4a1dba10a4a932326a3"
+      }
+    },
+    "addons": [
+        "heroku-postgresql:hobby-dev"
+    ],
+    "environments": {
+        "review": {
+            "addons": ["heroku-postgresql:hobby-dev"]
+        }
+    }
+}

@@ -19,10 +19,7 @@
     ],
     "environments": {
         "review": {
-            "addons": ["heroku-postgresql:hobby-dev"],
-            "env": {
-                "PGSSLMODE": "no-verify"
-            }
+            "addons": ["heroku-postgresql:hobby-dev"]
         }
     }
 }

@@ -68,11 +68,11 @@ async function errorHandler(ctx: Koa.DefaultContext, next: Koa.Next) {
         await next();
     } catch (err) {
         if (err instanceof HttpError) {
-            ctx.statusCode = err.status;
+            ctx.status = err.status;
             ctx.set("Cache-Control", "no-store"); // Note: Protocol requirement.
             ctx.body = err.errorInfo;
         } else {
-            ctx.statusCode = 500;
+            ctx.status = 500;
             ctx.set("Cache-Control", "no-store"); // Note: Protocol requirement.
             ctx.body = new ErrorInfo(
                 "unknown_error",

@@ -8,7 +8,8 @@ import './db/setup.js';
 
 const app = new Koa();
 
-app.use(serve('../frontend/build'));
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use(serve(path.resolve(__dirname, '../frontend/build')));
 app.use(mount('/oauth', auth));
 
 const port = process.env.PORT || 3000;

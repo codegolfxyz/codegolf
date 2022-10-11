@@ -1,11 +1,14 @@
-import express, { NextFunction, Request, Response } from "express";
-import bodyParser from "body-parser";
+import Koa from "koa";
+import bodyParser from "koa-bodyparser";
+import Router from "koa-router";
 import jwt from "jsonwebtoken";
 import { HttpError, ErrorInfo, UnsupportedGrantType, InvalidClientError } from "./errors.js";
+import db from '../db/db.js';
 
-const app = express();
+const app = new Koa();
+const router = new Router();
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser());
 
 // The current secure key, and one or more previous keys to support key rotation
 const keys = process.env.SECURE_KEY!.split(",").map(
@@ -16,13 +19,19 @@ const newestKey = keys[0];
 const previousKeys = keys.slice(1);
 
 // Simple OAuth 2.0 Password Grant implementation
-app.post("/token", (req, res) => {
-    if (req.body.grant_type !== "password") {
-        throw new UnsupportedGrantType(req.body.grant_type);
+router.post("/token", async (ctx, next) => {
+    const body = ctx.request.body;
+
+    if (typeof body === "undefined") {
+        throw new UnsupportedGrantType("undefined");
     }
 
-    const username = req.body.username;
-    const password = req.body.password;
+    if (body.grant_type !== "password") {
+        throw new UnsupportedGrantType(`${body.grant_type}`);
+    }
+
+    const username = body.username;
+    const password = body.password;
 
     if (typeof username !== "string") {
         throw new InvalidClientError(`Invalid type for username: ${typeof username}.`);
@@ -32,41 +41,50 @@ app.post("/token", (req, res) => {
         throw new InvalidClientError(`Invalid type for password: ${typeof password}.`);
     }
 
-    // TODO: Actually validate username and password.
+    const result = await db.query("SELECT * FROM users WHERE username=$1::text AND password=$2::text", [username, password]);
+
+    if (result.rows.length < 1) {
+        throw new InvalidClientError("Invalid username or password.");
+    }
 
     const role = "user"; // TODO: Support admin or other roles.
 
     const approximatelyOneDay = 86400;
     const now = Math.round(new Date().getTime() / 1000);
     const accessTokenExpiration = now + 30 * approximatelyOneDay;
-    const accessToken = jwt.sign({type: "access", role: "role", exp: accessTokenExpiration}, newestKey);
-    res.header("Cache-Control", "no-store"); // Note: Protocol requirement.
-    res.send({
+    const accessToken = jwt.sign({type: "access", role: role, exp: accessTokenExpiration}, newestKey);
+    ctx.set("Cache-Control", "no-store"); // Note: Protocol requirement.
+    ctx.body = {
         access_token: accessToken,
         token_type: "Bearer",
         expires_in: 30 * approximatelyOneDay,
         // refresh_token: refreshToken, // TODO: Support refresh tokens.
         scope: "user"
-    });
+    };
 });
 
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    if (res.headersSent) {
-        return next(err);
+async function errorHandler(ctx: Koa.DefaultContext, next: Koa.Next) {
+    try {
+        await next();
+    } catch (err) {
+        if (err instanceof HttpError) {
+            ctx.statusCode = err.status;
+            ctx.set("Cache-Control", "no-store"); // Note: Protocol requirement.
+            ctx.body = err.errorInfo;
+        } else {
+            ctx.statusCode = 500;
+            ctx.set("Cache-Control", "no-store"); // Note: Protocol requirement.
+            ctx.body = new ErrorInfo(
+                "unknown_error",
+                `An unknown error occurred: ${err}`
+            );
+        }
     }
+}
 
-    if (err instanceof HttpError) {
-        res.statusCode = err.status;
-        res.header("Cache-Control", "no-store"); // Note: Protocol requirement.
-        res.send(err.errorInfo);
-    } else {
-        res.statusCode = 500;
-        res.header("Cache-Control", "no-store"); // Note: Protocol requirement.
-        res.send(new ErrorInfo(
-            "unknown_error",
-            `An unknown error occurred: ${err.toString()}`
-        ));
-    }
-});
+app
+    .use(errorHandler)
+    .use(router.routes())
+    .use(router.allowedMethods());
 
 export default app;

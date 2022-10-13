@@ -11,6 +11,7 @@ const server = new ApolloServer({
     resolvers,
     csrfPrevention: true,
     cache: 'bounded',
+    introspection: true, // TODO: Turn off outside of development
     plugins: [
         // TODO: Figure out how to integrate this plugin with Koa sub apps (difficult because no access to httpServer)
         // ApolloServerPluginDrainHttpServer({ httpServer }),

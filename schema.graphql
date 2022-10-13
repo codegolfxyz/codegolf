@@ -1,0 +1,27 @@
+type Problem {
+  id: String!
+  title: String!
+  prompt: String!
+  author: User!
+  code: String!
+  solutions: [Solution!]!
+}
+
+type Solution {
+  id: String!
+  author: User!
+  code: String!
+  problem: Problem!
+}
+
+type User {
+  id: String!
+  username: String!
+}
+
+type Query {
+  problems: [Problem!]!
+  problem(id: ID!): Problem
+  user(id: ID!): User
+  solution(id: ID!): Solution
+}

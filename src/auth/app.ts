@@ -4,6 +4,7 @@ import Router from "koa-router";
 import jwt from "jsonwebtoken";
 import { HttpError, ErrorInfo, UnsupportedGrantType, InvalidClientError } from "./errors.js";
 import db from '../db/db.js';
+import { User } from "../generated/graphql.js";
 
 const app = new Koa();
 const router = new Router();
@@ -19,7 +20,7 @@ const newestKey = keys[0];
 const previousKeys = keys.slice(1);
 
 // Simple OAuth 2.0 Password Grant implementation
-router.post("/token", async (ctx, next) => {
+router.post("/token", async (ctx) => {
     const body = ctx.request.body;
 
     if (typeof body === "undefined") {
@@ -47,6 +48,8 @@ router.post("/token", async (ctx, next) => {
         throw new InvalidClientError("Invalid username or password.");
     }
 
+    const user = result.rows[0] as User;
+
     const role = "user"; // TODO: Support admin or other roles.
 
     const approximatelyOneDay = 86400;
@@ -59,7 +62,8 @@ router.post("/token", async (ctx, next) => {
         token_type: "Bearer",
         expires_in: 30 * approximatelyOneDay,
         // refresh_token: refreshToken, // TODO: Support refresh tokens.
-        scope: "user"
+        scope: "user",
+        user_id: user.id
     };
 });
 

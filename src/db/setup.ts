@@ -1,31 +1,20 @@
-import db from "./db.js";
+import './tables/problems.js';
+import './tables/solutions.js';
+import createUsers from './tables/users.js';
+import createProblems from './tables/problems.js';
+import seedDatabase from './seed.js';
 
-// TODO: Remove me after we implement user creation.
-await db.query(`DROP TABLE IF EXISTS users`);
+import db from './db.js';
 
-try {
-    await db.query("SELECT 42 FROM users WHERE username = 'nardi'");
-} catch {
-    await db.query(`
-        CREATE TABLE users (
-            id uuid DEFAULT gen_random_uuid(),
-            username VARCHAR(100) NOT NULL,
-            password VARCHAR(100) NOT NULL,
-            created_at TIMESTAMP NOT NULL DEFAULT now(),
-            PRIMARY KEY (id)
-        )
-    `);
-    await db.query('CREATE UNIQUE INDEX users_by_username ON users (username)');
-    await db.query(`CREATE INDEX users_by_username_and_password ON users (username, password)`);
+export default async () => {
+    // TODO: Remove me after we implement problem creation, and start doing migrations instead so we don't lose data.
+    await db.query(`DROP TABLE IF EXISTS problems`);
+    await db.query(`DROP TABLE IF EXISTS solutions`);
+    await db.query(`DROP TABLE IF EXISTS users`);
 
-    // seed database with admin users
-    await db.query(`INSERT INTO users (username, password) VALUES ('nardi', 'hunter2')`);
-    await db.query(`INSERT INTO users (username, password) VALUES ('pickles', 'hunter3')`);
-    await db.query(`INSERT INTO users (username, password) VALUES ('badger', 'hunter4')`);
-}
+    await createUsers();
+    await createProblems();
+    await seedDatabase();
 
-const res = await db.query('SELECT $1::text as message', ['Database setup complete!']);
-console.log(res.rows[0].message);
-
-const users = await db.query(`SELECT * FROM users`);
-console.log(users.rows);
+    console.log("Database setup complete.");
+};
